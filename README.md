@@ -31,8 +31,11 @@ For example, if you want to autocrop all of the .tif files in a directory:
     for (i=0;i<lengthOf(dir_list);i++) {
         if (endsWith(dir_list[i],extension)) {
             open(dir + dir_list[i]);
+            title = getTitle();
+            title_new = replace(title, extension, "_autocrop" + extension);
             run("Autocrop Black Edges");
-            saveAs(dir + replace(dir_list[i], extension, "_autocrop" + extension));
+            selectWindow(title_new); //you only need this for batch mode
+            saveAs(dir + title_new);
             run("Close All");
         }
     }
