@@ -28,7 +28,7 @@ def find_largest_rectangle_2D(array):
     pos_at_max_area = (0,0)
     height_at_max_area = -1
     x_end = 0
-
+    
     #go through each row of vertical sums and find the largest rectangle
     for i in range(len(vert_sums)):
         positions = []  # a stack
@@ -89,7 +89,10 @@ def open_test_img():
 
 def main():
 
-    #opens the image and gets its name
+    # ensures black background for binary images
+    IJ.run("Options...", "black")
+	
+    # opens the image and gets its name
     # imp = open_test_img()
     # imp.show()
     imp = IJ.getImage()
@@ -98,15 +101,13 @@ def main():
 
     # does a minimum projection and makes a mask
     imp_min = ZProjector.run(imp, 'min')
+    if imp_min.getBitDepth()==24:
+    	IJ.run(imp_min, "8-bit", "")
     ip = imp_min.getProcessor()
-    ip.setThreshold(1,9999999999,1)
+    ip.setThreshold(1,99999,1)
     mask = ip.createMask()
     mask = ImagePlus("mask",mask)
-
-    # fills in the holes in the mask
-    IJ.run(mask, "Invert", "")
-    IJ.run(mask, "Fill Holes", "")
-    IJ.run(mask, "Invert", "")
+    IJ.run(mask, "Fill Holes", "")     
 
     # converts to list and then finds the crop coordinates
     px = mask.getProcessor().getPixels()
@@ -117,6 +118,7 @@ def main():
     # crops the original image
     imp.setRoi(crop_top_left[0], crop_top_left[1], crop_width, crop_height)
     imp_cropped = imp.resize(crop_width, crop_height, "bilinear")
+    IJ.run(imp, "Select None", "")
     imp_cropped.setTitle(basename + "_autocrop" + extension)
     imp_cropped.show()
 
